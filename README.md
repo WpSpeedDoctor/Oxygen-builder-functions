@@ -13,6 +13,8 @@ Add editor query string
 
 Back to top
 
+Disable WordPress default image lazy load 
+
 Empty
 
 Google analytics lite
