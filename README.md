@@ -13,7 +13,15 @@ Add editor query string
 
 Back to top
 
-Disable WordPress default image lazy load 
+Cookie consent popup window
+
+Custom img src sizes
+
+Disable WordPress default image lazy load
+
+Exclude script from cf rocket loader
+
+Favicon loader
 
 Empty
 
@@ -21,7 +29,11 @@ Google analytics lite
 
 Google tag manager
 
+Image height and width
+
 Lazy load bg images
+
+Preload jquery
 
 Remove redundant shortlink
 
