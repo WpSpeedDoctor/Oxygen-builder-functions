@@ -7,17 +7,21 @@ defined( 'ABSPATH' ) || exit;
  * Credit and documentation https://wpdevdesign.com/how-to-add-google-tag-manager-code-in-oxygen/
  */
 
-if ( !empty($attribute) ) set_transient( 'oxy_gtm_property', $attribute, 1 );
-
+define( 'OXY_GTM_PROPERTY', $attribute );
 
 /**
  * Adds Google Tag Manager code in <head> below the <title>.
  */
-if ( ! function_exists( 'sk_google_tag_manager1' ) && !empty($attribute) ){
+if ( ! function_exists( 'sk_google_tag_manager1' ) ){
 
 	function sk_google_tag_manager1() {
 
-		$ga_property_value = get_transient( 'oxy_gtm_property' );
+		if ( empty( OXY_GTM_PROPERTY ) ) {
+			
+			echo '<!-- Google Tag Manager is disabled, has no set property in settings -->';
+
+			return;
+		}
 
 		?>
 
@@ -26,7 +30,7 @@ if ( ! function_exists( 'sk_google_tag_manager1' ) && !empty($attribute) ){
 	    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
 	    j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 	    'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-	    })(window,document,'script','dataLayer','<?php echo $ga_property_value; ?>');</script>
+	    })(window,document,'script','dataLayer','<?php echo OXY_GTM_PROPERTY; ?>');</script>
 	    <!-- End Google Tag Manager -->
 
 	<?php }
@@ -38,19 +42,16 @@ if ( ! function_exists( 'sk_google_tag_manager1' ) && !empty($attribute) ){
 /**
  * Adds Google Tag Manager code immediately after the opening <body> tag.
  */
-if ( ! function_exists( 'sk_google_tag_manager1' ) && !empty($attribute) ){
+if ( ! function_exists( 'sk_google_tag_manager2' ) && !empty( OXY_GTM_PROPERTY ) ){
 	function sk_google_tag_manager2() { 
-
-		$ga_property_value = get_transient( 'oxy_gtm_property' );
 		
 		?>
-
 	    <!-- Google Tag Manager (noscript) -->
-	    <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=<?php echo $ga_property_value; ?>"
+	    <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=<?php echo OXY_GTM_PROPERTY; ?>"
 	    height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 	    <!-- End Google Tag Manager (noscript) -->
-
-	<?php }
+		<?php
+	}
 
 	add_action( 'ct_before_builder', 'sk_google_tag_manager2' );
 
