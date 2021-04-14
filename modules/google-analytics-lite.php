@@ -7,13 +7,18 @@ defined( 'ABSPATH' ) || exit;
  * Credit and documentation https://gist.github.com/DavidKuennen/443121e692175d6fc145e1efb0284ec9
  */
 
-if ( !empty($attribute) ) set_transient( 'oxy_ga_property', $attribute, 1 );
+define( 'OXY_GA_PROPERTY', $attribute );
 
-if ( ! function_exists( 'google_analytics_lite') && !empty($attribute) ) {
+if ( ! function_exists( 'google_analytics_lite') ) {
 
     function google_analytics_lite() { 
 
-    $ga_property_value = get_transient( 'oxy_ga_property' );
+    if ( empty( OXY_GA_PROPERTY ) ) {
+            
+            echo '<!-- Google Analytics is disabled, has no set property in settings -->';
+
+            return;
+        }
 
     ?>
 <script type="text/javascript">
@@ -99,7 +104,7 @@ if ( ! function_exists( 'google_analytics_lite') && !empty($attribute) ) {
         trackEvent,
         trackException
     }
-})(window, "<?php echo $ga_property_value; ?>", {
+})(window, "<?php echo OXY_GA_PROPERTY; ?>", {
     anonymizeIp: true,
     colorDepth: true,
     characterSet: true,
