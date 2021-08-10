@@ -7,32 +7,39 @@ defined( 'ABSPATH' ) || exit;
  * 
  */
 
-if( empty($attribute) ) $attribute = false;
+	
+define ( 'OXI_IMG_CDN', empty($attribute) ? false : $attribute  ); 
 
-define ( 'OXI_IMG_CDN', $attribute ); 
-
-if ( ! function_exists( 'remove_non_local_images' )){
-	function remove_non_local_images( $img_elements_all ) {
+if ( ! function_exists( 'remove_non_local_images_oximg' )){
+	function remove_non_local_images_oximg( $img_elements_all ) {
 		
-		$site_url = get_site_url();
+		foreach ( $img_elements_all as $img_element) {
 
-		$result = false;
-
-		foreach ( $img_elements_all as $key => $value) {
-
-			if ( strpos( $value, $site_url ) || OXI_IMG_CDN !== false && strpos( $value, OXI_IMG_CDN ) ) $result[] = $value;
+			if ( has_local_url_oximg($img_element) ) $result[] = $img_element;
 
 		}
 
-		return $result; 
+		return empty($result) ? false : $result; 
 		
 	}
 }
 
+if ( ! function_exists( 'has_local_url_oximg' )){
+	function has_local_url_oximg( $string ) {
+	
+		$site_url = get_site_url();
+		
+		if ( is_int( strpos( $string, $site_url ) ) ) return true;
+
+		if (!OXI_IMG_CDN) return false;
+
+		return is_int( strpos( $string, OXI_IMG_CDN ) );
+	}
+}
 
 
-if ( ! function_exists( 'oximg_get_images_elements' )){
-	function oximg_get_images_elements( $buffer = false ) {
+if ( ! function_exists( 'get_images_elements_oximg' )){
+	function get_images_elements_oximg( $buffer = false ) {
 	
 		if ( !$buffer ) return false;
 
@@ -40,76 +47,26 @@ if ( ! function_exists( 'oximg_get_images_elements' )){
 		
 		$img_elements_all = call_user_func_array('array_merge', $img_elements);
 
-		$result = remove_non_local_images($img_elements_all);
+		$result = remove_non_local_images_oximg($img_elements_all);
 
 		return $result;
 	}
 }
 
-if ( ! function_exists( 'oximg_get_width_height_string_from_db' )){
-	function oximg_get_width_height_string_from_db( $filename ) {
-	
-		global $wpdb;
-
-		$sql = "SELECT `meta_value` FROM `".$wpdb->prefix."postmeta` WHERE `meta_key` = '_wp_attachment_metadata' AND `meta_value` LIKE '%$filename%'";
-	
-		$image_raw_data = $wpdb->get_row($sql, 'ARRAY_N');
-
-		if ( empty($image_raw_data) ) return false;
-
-		return unserialize($image_raw_data[0]);
-
-	
-	}
-}
-
-
-if ( ! function_exists( 'oximg_get_width_height_string' )){
-	function oximg_get_width_height_string( $filename ) {
-		
-		$image_data_array = oximg_get_width_height_string_from_db( $filename );
-
-		if ( empty($image_data_array) ) return false;
-
-		if ( basename($image_data_array['file']) == $filename ) {
-
-			return 'width="'.$image_data_array['width'].'" height="'.$image_data_array['height'].'"';
-
-		}
-
-		if ( empty($image_data_array['sizes']) ) return false;
-
-
-		foreach ( $image_data_array['sizes'] as $key => $value ) {
-
-			if ( $value['file'] == $filename ) {
-
-				return 'width="'.$value['width'].'" height="'.$value['height'].'"';
-
-			}
-
-		}
-			
-		return false;
-	
-	}
-}
-
-
-if ( ! function_exists( 'oximg_get_images_data' )){
-	function oximg_get_images_data( $img_elements ) {
+if ( ! function_exists( 'get_images_data_oximg' )){
+	function get_images_data_oximg( $img_elements ) {
 		
 		$result = false;
 
 		foreach ($img_elements as $key => $img_element ) {
 
-			if ( strpos($img_element, 'width=' ) !== false ) continue;
-
+			if ( is_int(strpos($img_element, 'width=' ) ) ) continue;
+			
 			preg_match('/src="([\S\s]*?)"/', $img_element, $output_array );
 
-			$filename = basename( $output_array[1]);
+			$img_filepath = convert_url_to_path_oximg( $output_array[1] );
 
-			$img_string = oximg_get_width_height_string($filename);
+			$img_string = getimagesize( $img_filepath)[3];
 
 			if (!empty($img_string) ) $result[] = array( 'html' => $img_element, 'add_string' => $img_string );
 
@@ -119,8 +76,25 @@ if ( ! function_exists( 'oximg_get_images_data' )){
 	}
 }
 
-if ( ! function_exists( 'oximg_add_height_with_to_imgs' )){
-	function oximg_add_height_with_to_imgs( $buffer, $img_data_array ) {
+if ( ! function_exists( 'convert_url_to_path_oximg' )){
+
+	function convert_url_to_path_oximg( $url ) {
+
+			$parsed_url = parse_url( $url );
+
+			if( empty( $parsed_url['path'] ) ) return false;
+			
+			$file = ABSPATH . ltrim( $parsed_url['path'], '/');
+			
+			if ( file_exists( $file) ) return $file;
+			
+			return false;
+		}	
+}
+
+
+if ( ! function_exists( 'add_height_with_to_imgs_oximg' )){
+	function add_height_with_to_imgs_oximg( $buffer, $img_data_array ) {
 	
 		foreach ($img_data_array as $key => $value) {
 
@@ -134,29 +108,28 @@ if ( ! function_exists( 'oximg_add_height_with_to_imgs' )){
 }
 
 
-function oximg_far_ob_call( $buffer ) { 
+function far_ob_call_oximg( $buffer ) { 
 
-    $img_elements = oximg_get_images_elements( $buffer );
-    
+    $img_elements = get_images_elements_oximg( $buffer );
+
     if (!$img_elements) return $buffer;
 
-    $img_data_array = oximg_get_images_data( $img_elements );
+    $img_data_array = get_images_data_oximg( $img_elements );
 
     if (!$img_data_array) return $buffer;
 
-    $output = oximg_add_height_with_to_imgs( $buffer, $img_data_array );
+    $output = add_height_with_to_imgs_oximg( $buffer, $img_data_array );
 
     return $output;
 }
 
-function oximg_template_redirect() {
+function template_redirect_oximg() {
 
 	if ( isset($_GET['ct_template']) or isset($_GET['ct_builder']) ) return; 
 
     ob_start();
-    ob_start( 'oximg_far_ob_call' );
+
+    ob_start( 'far_ob_call_oximg' );
 }
  
-add_action( 'template_redirect', 'oximg_template_redirect' );
-
-
+add_action( 'template_redirect', 'template_redirect_oximg' );
