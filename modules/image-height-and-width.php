@@ -62,7 +62,7 @@ if ( ! function_exists( 'get_images_data_oximg' )){
 
 			if ( is_int(strpos($img_element, 'width=' ) ) ) continue;
 			
-			preg_match('/src="([\S\s]*?)"/', $img_element, $output_array );
+			preg_match('/src=[\'|"]([\S\s]*?)[\'|"]/', $img_element, $output_array );
 
 			$img_filepath = convert_url_to_path_oximg( $output_array[1] );
 
