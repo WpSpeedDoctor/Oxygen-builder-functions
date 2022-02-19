@@ -33,6 +33,8 @@ Image height and width
 
 Lazy load bg images
 
+Oxygen template as ACF location
+
 Preload jquery
 
 Remove redundant shortlink
