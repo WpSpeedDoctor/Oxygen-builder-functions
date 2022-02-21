@@ -41,6 +41,8 @@ Remove redundant shortlink
 
 Selective disable css js
 
+Website general settings
+
 Wp custom thumbnails
 
 
