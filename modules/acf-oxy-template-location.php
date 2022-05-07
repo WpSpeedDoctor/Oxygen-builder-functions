@@ -89,13 +89,17 @@ if ( class_exists('\ACF_Location')){
 
 		private function has_this_post_type_template( $rule, $screen ){
 
-			return $screen['post_type'] == get_post_meta( $rule['value'],'ct_template_post_types' )[0][0];
+			if ( empty($screen['post_type']) || empty($rule['value']) ) return false;
+
+			return $screen['post_type'] == get_post_meta( $rule['value'],'ct_template_post_types' )[0][0]??false;
 			
 		}
 
 		private function has_post_oxy_template( $rule, $screen ){
 
-			return $rule['value'] == get_post_meta($screen['post_id'],'ct_other_template')[0];
+			if ( empty($screen['post_id']) || empty($rule['value']) ) return false;
+			
+			return $rule['value'] == get_post_meta($screen['post_id'],'ct_other_template')[0]??false;
 		}
 
 	}
