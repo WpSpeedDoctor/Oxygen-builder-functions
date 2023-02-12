@@ -65,5 +65,5 @@ function get_icon_name( $shortcode_options ){
 	//regex is faster than json_decode in this case, 50 μs to 5 μs difference
 	preg_match('/"oxy-pro-menu_dropdown_icon":"(.+?)"/', $shortcode_options, $output_array);
 
-	return $output_array[1]??'';
+	return $output_array[1]??'FontAwesomeicon-arrow-circle-o-down';
 }
