@@ -1,34 +1,37 @@
 <?php
 
+namespace oxy_func\image_thumbnails;
+
 defined( 'ABSPATH' ) || exit;
 
 /**
- * Description: Set and remove WordPress thumbnails
+ * Description: Set new and remove useless WordPress thumbnails
  */
 
-if ( ! function_exists( 'custom_image_sizes_oximg')){
-	function custom_image_sizes_oximg() {
+function custom_image_sizes_oximg() {
 
-		add_image_size('smartphone',414,0, false );
-		add_image_size('smartphone-portrait',414,800, true );
+	add_image_size('smartphone',414,0, false );
 
-		remove_image_size( '1536x1536' );
-		remove_image_size( '2048x2048' );
+	//Vertically cropped image
+	//add_image_size('smartphone-vertical',414,800, true );
 
-	}
 
-	add_action('init', 'custom_image_sizes_oximg');
+	remove_image_size( '1536x1536' );
+	remove_image_size( '2048x2048' );
 
 }
+
+add_action('init', 'oxy_func\image_thumbnails\custom_image_sizes_oximg');
+
+
 
 // Add custom sizes to WordPress Media Library dropdown menu
-if ( ! function_exists('add_thumbnail_into_menu_oximg') ){
-	function add_thumbnail_into_menu_oximg( $sizes ) {
-	  
-	    return array_merge( $sizes, array(
+function add_thumbnail_into_menu_oximg( $sizes ) {
+	
+	return array_merge( $sizes, array(
 		'smartphone' => __('Smartphone'),
-	     	'smartphone-portrait' => __('Smartphone portrait'),
-	    ) );
-	}
-	add_filter( 'image_size_names_choose', 'add_thumbnail_into_menu_oximg' );
+		'smartphone-portrait' => __('Smartphone portrait'),
+	) );
 }
+
+add_filter( 'image_size_names_choose', 'oxy_func\image_thumbnails\add_thumbnail_into_menu_oximg' );
