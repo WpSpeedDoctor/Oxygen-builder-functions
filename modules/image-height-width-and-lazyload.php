@@ -1,6 +1,6 @@
 <?php
 
-namespace oxy_func\image_dimentions;
+namespace oxy_func\image_dimensions;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -9,17 +9,17 @@ defined( 'ABSPATH' ) || exit;
  * 
  */
 
-add_filter('do_shortcode_tag', 'oxy_func\image_dimentions\the_image_dimentions',10,3);
+add_filter('do_shortcode_tag', 'oxy_func\image_dimensions\the_image_dimensions',10,3);
 
-function the_image_dimentions( $content, $shortcode_name='', $shortcode_options=false ){
+function the_image_dimensions( $content, $shortcode_name='', $shortcode_options=false ){
 
-	if($shortcode_name!='ct_image') return $content;
+	if( $shortcode_name != 'ct_image' ) return $content;
 
 	$image_options = json_decode($shortcode_options['ct_options'],true);
 
-	$image_with_dimentions = add_height_and_width( $content, $image_options['original']??[] );
+	$image_with_dimensions = add_height_and_width( $content, $image_options['original']??[] );
 	
-	return add_loading_lazy_markup($image_with_dimentions, $image_options['classes']??[]);
+	return add_loading_lazy_markup($image_with_dimensions, $image_options['classes']??[]);
 }
 
 function add_loading_lazy_markup($content, $classes){
@@ -36,7 +36,7 @@ function is_lazyload_disabled_in_wp(){
 
 function add_height_and_width($content, $image_options){
 
-	if(empty($image_options['attachment_height'])) return $content;
+	if( empty( $image_options['attachment_height'] ) ) return $content;
 	
 	$image_dimensions_markup = ' height="'.$image_options['attachment_height'].'" width="'.$image_options['attachment_width'].'" />';
 
