@@ -6,12 +6,31 @@ defined( 'ABSPATH' ) || exit;
  * Description: Selective disable CSS and JS
  */
 
-if ( ! function_exists( 'deregister_styles')){
 
-  function deregister_styles()    { 
-     wp_deregister_style( 'wp-block-library' );
-     wp_dequeue_style ('wp-block-library');
-  }
+function wpsd_deregister_styles(){
+	
+	$css_handles_to_remove = [
 
-  add_action( 'wp_print_styles', 'deregister_styles', 100 );
+		/**
+		 * default WP styles that are useless for Oxygen Builder 
+		 */
+		'wp-block-library',
+		
+		'global-styles',
+		
+		'classic-theme-styles'
+	
+	
+	];
+
+	foreach( $css_handles_to_remove as $css_handle ){
+
+		wp_deregister_style( $css_handle );
+
+		wp_dequeue_style( $css_handle );
+
+	}
+
 }
+
+add_action( 'wp_print_styles', 'wpsd_deregister_styles', 100 );
